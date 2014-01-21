@@ -59,7 +59,7 @@ Peer {
 			@Override
 			public void run() {
 				try {
-                                        System.out.println("Je suis : " + PeerImpl.this.getId());
+                                       // System.out.println("Je suis : " + PeerImpl.this.getId());
                                         
                                         if(PeerImpl.this.getboolcheckdead() == false )
                                         {
