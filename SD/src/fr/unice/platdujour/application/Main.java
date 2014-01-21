@@ -91,7 +91,7 @@ public class Main {
                 serialization(tracker.getRandomPeer());
                 killPeer(tracker.getRandomPeer()); 
                 int i = 0;
-                while(i==0){
+                while(i !=0){
                     afficherPeer(tracker.getRandomPeer());
                 }
 	}

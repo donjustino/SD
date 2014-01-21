@@ -79,12 +79,14 @@ Peer {
 						
 				} catch (RemoteException e) {
 					try{
-					System.out.println("Peer sucesseur perdu, effacement"); 
-                                        
-                                        PeerImpl.this.tracker.delPeer(PeerImpl.this.successor);
-					PeerImpl.this.successor = PeerImpl.this.replicatsuccessor.getSuccessor();
-					PeerImpl.this.successorofsuccessor = PeerImpl.this.replicatsuccessor.getSuccessor();
-					PeerImpl.this.successor.setPredecessor(PeerImpl.this);
+					System.out.println("Remove effectué = " + PeerImpl.this.tracker.delPeer(PeerImpl.this.successor));
+						PeerImpl.this.successor = PeerImpl.this.successorofsuccessor;
+						PeerImpl.this.successorofsuccessor = PeerImpl.this.successor.getSuccessor();
+						PeerImpl.this.successor.setPredecessor(PeerImpl.this);
+						PeerImpl.this.predecessor.setSuccessorofSuccessor(PeerImpl.this.successor);
+						System.out.println(PeerImpl.this.describe());
+						
+						//PeerImpl.this.tracker.dataRecovery();
 				
 					//System.out.println(PeerImpl.this.describe());
 						
