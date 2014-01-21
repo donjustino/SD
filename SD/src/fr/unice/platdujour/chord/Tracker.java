@@ -30,5 +30,5 @@ public List<Peer> getPeers() throws RemoteException ;
         
     public void setPeers(List<Peer> p)throws RemoteException ;
     
-    public void delPeer(Peer peer) throws RemoteException, AlreadyRegisteredException;
+    public boolean delPeer(Peer peer) throws RemoteException, AlreadyRegisteredException;
 }

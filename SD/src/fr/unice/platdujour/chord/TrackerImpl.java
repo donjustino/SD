@@ -70,10 +70,8 @@ public class TrackerImpl extends UnicastRemoteObject implements Tracker {
     public void setPeers(List<Peer> p)throws RemoteException {
         this.peers = p;
     }
-    public synchronized void delPeer(Peer peer) throws RemoteException, AlreadyRegisteredException {
-        if (this.peers.contains(peer)) {
-            System.out.println("Suppression du peer dans le tracker");
-            this.peers.remove(peer);
-        }
+    public synchronized boolean delPeer(Peer peer) throws RemoteException, AlreadyRegisteredException {
+            return this.peers.remove(peer);
+  
     }
 }
