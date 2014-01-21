@@ -22,7 +22,7 @@ public class TrackerImpl extends UnicastRemoteObject implements Tracker {
     private static final long serialVersionUID = 1L;
 
     /** List of peers that belong to the network */
-    private List<Peer> peers;
+    private final List<Peer> peers;
 
     /** Used for random picking in the peer list*/
     private final Random randomGenerator;
@@ -63,15 +63,9 @@ public class TrackerImpl extends UnicastRemoteObject implements Tracker {
         return this.peers.get(this.randomGenerator.nextInt(this.peers.size()));
     }
     @Override
-   public List<Peer> getPeers()throws RemoteException {
-        return this.peers;
-    }
-   @Override
-    public void setPeers(List<Peer> p)throws RemoteException {
-        this.peers = p;
-    }
-    public synchronized boolean delPeer(Peer peer) throws RemoteException, AlreadyRegisteredException {
-            return this.peers.remove(peer);
-  
-    }
+    public synchronized boolean delPeer(Peer peer) throws RemoteException {
+		return this.peers.remove(peer);
+		
+}   
+
 }

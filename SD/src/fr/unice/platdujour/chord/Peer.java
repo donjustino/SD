@@ -117,11 +117,14 @@ public interface Peer extends Remote {
      */
     void die() throws RemoteException;
     
-    void setSuccesorofSuccessor(Peer p) throws RemoteException;
-
-    void setboolcheckdead(boolean b) throws RemoteException;
+    public void setSuccessorofSuccessor(Peer peer) throws RemoteException;
     
-     public void serialization(Peer temp) throws RemoteException, FileNotFoundException, IOException;
+    public Tracker getTracker() throws RemoteException;
+
+    public void setTracker(Tracker tracker) throws RemoteException;
+    
+    public void serialization(Peer temp) throws RemoteException, FileNotFoundException, IOException;
      
-     public void deserialization() throws RemoteException, FileNotFoundException, IOException, ClassNotFoundException;
+    public void deserialization() throws RemoteException, FileNotFoundException, IOException, ClassNotFoundException;
+    
 }

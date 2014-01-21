@@ -2,8 +2,8 @@ package fr.unice.platdujour.chord;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+
 import fr.unice.platdujour.exceptions.AlreadyRegisteredException;
-import java.util.List;
 
 /**
  * This interface defines the API of a tracker. It is supposed to keep track 
@@ -26,9 +26,6 @@ public interface Tracker extends Remote {
      * @throws RemoteException
      */
     Peer getRandomPeer() throws RemoteException;
-public List<Peer> getPeers() throws RemoteException ;
-        
-    public void setPeers(List<Peer> p)throws RemoteException ;
     
-    public boolean delPeer(Peer peer) throws RemoteException, AlreadyRegisteredException;
+    public boolean delPeer(Peer peer) throws RemoteException;
 }

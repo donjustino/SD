@@ -1,12 +1,12 @@
 package fr.unice.platdujour.chord;
 
-import fr.unice.platdujour.exceptions.AlreadyRegisteredException;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
@@ -40,73 +40,62 @@ Peer {
 	/** Peer that is just after in the virtual ring */
 	private Peer successor;
         
-        private Peer successorofsuccessor;
+        /**
+	 * Pair successeur de la pair successeur de ce peer
+	 */
+	private Peer successorofsuccessor;
         
-        private boolean boolcheckdead;
-
-        private Map<String, String> directoryreplicat;
         
-        private Peer replicatsuccessor;
-        ScheduledExecutorService threadPool;
-        
+        /**
+	 * Création d'un objet tracker
+	 */
         Tracker tracker;
-	public Tracker getTracker() throws RemoteException {
-		return tracker;
-	}
+        
+        ScheduledExecutorService threadPool;
 
-
-	public void setTracker(Tracker tracker) throws RemoteException {
-		this.tracker = tracker;
-	}
+        private final Map<String, String> directoryReplicat;
+        
+        Peer replicatsuccessor;
         
 	public PeerImpl(Identifier id) throws RemoteException {
 		this.id = id;
 		this.predecessor = this;
 		this.successor = this;
+		this.successorofsuccessor = this;
 		this.directory = new HashMap<String, String>();
+		this.directoryReplicat = new HashMap<String, String>();
 
 		threadPool =
 				Executors.newScheduledThreadPool(1);
-                
+		
 		final Runnable r = new Runnable() {
+
 			@Override
-                        public void run() {
+			public void run() {
 				try {
 					// The stabilize method is called periodically to update 
 					// the successor and predecessor links of the peer
-					System.out.println("Je suis :" + PeerImpl.this.getId());
-                                        PeerImpl.this.stabilize();
+						PeerImpl.this.stabilize();
 						
 				} catch (RemoteException e) {
 					try{
-                                                PeerImpl.this.deserialization();
-						System.out.println("Remove effectué = " + PeerImpl.this.tracker.delPeer(PeerImpl.this.successor));
-						PeerImpl.this.successor = PeerImpl.this.replicatsuccessor.getSuccessor();
-						PeerImpl.this.successorofsuccessor = PeerImpl.this.successor.getSuccessor();
-						PeerImpl.this.successor.setPredecessor(PeerImpl.this);
-						PeerImpl.this.predecessor.setSuccessor(PeerImpl.this.successor);
-						System.out.println(PeerImpl.this.describe());
+					System.out.println("Peer sucesseur perdu, effacement"); 
+                                        
+                                        PeerImpl.this.tracker.delPeer(PeerImpl.this.successor);
+					PeerImpl.this.successor = PeerImpl.this.replicatsuccessor.getSuccessor();
+					PeerImpl.this.successorofsuccessor = PeerImpl.this.replicatsuccessor.getSuccessor();
+					PeerImpl.this.successor.setPredecessor(PeerImpl.this);
+				
+					//System.out.println(PeerImpl.this.describe());
 						
-						//PeerImpl.this.tracker.dataRecovery();
 					}catch (RemoteException et) {
 						et.printStackTrace();
-					} catch (AlreadyRegisteredException ex) {
-                                        Logger.getLogger(PeerImpl.class.getName()).log(Level.SEVERE, null, ex);
-                                    } catch (IOException ex) {
-                                        Logger.getLogger(PeerImpl.class.getName()).log(Level.SEVERE, null, ex);
-                                    } catch (ClassNotFoundException ex) {
-                                        Logger.getLogger(PeerImpl.class.getName()).log(Level.SEVERE, null, ex);
-                                    }
+					}
 				}
 			}
 		};
 		threadPool.scheduleAtFixedRate(r, 0, 500, TimeUnit.MILLISECONDS);
 	}
-
-
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public synchronized void create() throws RemoteException {
 		this.predecessor = null;
@@ -231,7 +220,13 @@ Peer {
 	public synchronized void stabilize() throws RemoteException {
 		// x should be this itself, but it is not always the case, typically 
 		// if the successor has recently taken a new peer as predecessor
-		Peer x = this.successor.getPredecessor();
+		//System.out.println("On peer "+ this.getId());
+		Peer x = null;
+		try{
+			x = this.successor.getPredecessor();
+		}catch(NoSuchObjectException e){
+			System.err.println("no object successor");
+		}
 
 		// If x is this itself, then this condition is not valid. This 
 		// condition is valid if the successor has another peer as predecessor,
@@ -242,7 +237,7 @@ Peer {
 				x.getId().isBetweenOpenOpen(this.id, this.successor.getId())) {
 			this.successor = x;
 		}
-
+		this.successorofsuccessor = this.successor.getSuccessor();
 		// The current peer needs to inform its successor that it is indeed its
 		// successor 
 		this.successor.notify(PeerImpl.this);
@@ -311,44 +306,48 @@ Peer {
 		// from executing on this object. A further RMI call on this will 
 		// cause a java.rmi.NoSuchObjectException.
 		threadPool.shutdown();
-                this.predecessor.setboolcheckdead(true);
                 UnicastRemoteObject.unexportObject(this, true);
-              
 
 		System.out.println("Peer with id " + this.id + " has died.");
 	}
-        public void setSuccesorofSuccessor(Peer p) throws RemoteException {
-            this.successorofsuccessor = p;
-       
-    }
+        
+        public void setSuccessorofSuccessor(Peer peer) throws RemoteException {
+		this.successorofsuccessor=peer;
+	}
+        public Tracker getTracker() throws RemoteException {
+		return tracker;
+	}
+                
+	public void setTracker(Tracker tracker) throws RemoteException {
+		this.tracker = tracker;
+	}
 
     @Override
-    public void setboolcheckdead(boolean b) throws RemoteException {
-        this.boolcheckdead = b;
-    }
-
-    private boolean getboolcheckdead() {
-        return this.boolcheckdead;
-    }
     public void serialization(Peer temp) throws RemoteException, FileNotFoundException, IOException {
         FileOutputStream fichier = new FileOutputStream("peer"+this.getId()+".ser");
         ObjectOutputStream oos = new ObjectOutputStream(fichier);
         oos.writeObject(temp);
         oos.flush();
         oos.close();
+            try {
+                this.deserialization();
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(PeerImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
     }
-     public void deserialization() throws RemoteException, FileNotFoundException, IOException, ClassNotFoundException {
-        FileInputStream fichier = new FileInputStream("peer"+this.getId()+".ser");
+
+    @Override
+    public void deserialization() throws RemoteException, FileNotFoundException, IOException, ClassNotFoundException {
+      FileInputStream fichier = new FileInputStream("peer"+this.getId()+".ser");
         ObjectInputStream ois = new ObjectInputStream(fichier);
         this.replicatsuccessor = (Peer) ois.readObject();
+        System.out.println("Sauvegarde peer :" + this.replicatsuccessor.describe());
         //this.successor = this.replicatsuccessor.getSuccessor();
         //System.out.println("Ce peer" + this.describe());
         //System.out.println("Le replicat :" + this.replicatsuccessor.describe());
         //this.successor.setPredecessor(this.replicatsuccessor.getPredecessor());
         ois.close();
         fichier.close();
-        
     }
-     
-
+        
 }

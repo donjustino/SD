@@ -36,6 +36,11 @@ public class Main {
 	 * @param args Not used
 	 * @throws Exception
 	 */
+        static Tracker tracker;
+
+	public static Tracker getTracker() {
+		return tracker;
+	}
 	public static void main(String[] args) throws Exception {
 
 		// A tracker is created
@@ -83,15 +88,13 @@ public class Main {
 			System.out.println("\nRestaurant '" + restaurant + "' - Daily special: '"
 					+ guideMichelin.get(restaurant) + "'");
 		}
-                setsuccesorofsucessor(tracker.getRandomPeer());
                 serialization(tracker.getRandomPeer());
-                //deserialization(tracker.getRandomPeer());
-                killPeer(tracker.getRandomPeer(),tracker); 
+                killPeer(tracker.getRandomPeer()); 
                 int i = 0;
-                while (i == 0){
-                    listePeer(tracker.getRandomPeer());
+                while(i==0){
+                    afficherPeer(tracker.getRandomPeer());
                 }
-        }
+	}
 
 	/**
 	 * Creates a network composed of NB_PEERS peers.
@@ -108,6 +111,7 @@ public class Main {
 			if (i == 0) {
 				System.out.println("Ring created by " + p.getId());
 				p.create();
+                                p.setTracker(tracker);
 			} 
 			else {
 				// The new peer is inserted in the network using a random peer 
@@ -117,7 +121,9 @@ public class Main {
 				System.out.println("Added " + p.getId() + " from "
 						+ randomPeer.getId() + " that points to "
 						+ randomPeer.getSuccessor().getId());
-				p.join(randomPeer);
+				
+                                p.setTracker(tracker);
+                                p.join(randomPeer);
 			}
 
 			tracker.register(p);
@@ -141,16 +147,7 @@ public class Main {
 
 		} while (!nextPeer.equals(landmarkPeer));
 	}
-         private static void setsuccesorofsucessor(Peer landmarkPeer) throws RemoteException{
-            Peer nextPeer = landmarkPeer;
-            do {
-                 
-                           nextPeer = nextPeer.getSuccessor();
-                           nextPeer.setSuccesorofSuccessor(nextPeer.getSuccessor().getSuccessor());
-                          
-               } while ((!nextPeer.equals(landmarkPeer)));
-        }
-         private static void killPeer(Peer landmarkPeer, Tracker tracker) throws RemoteException, AlreadyRegisteredException{
+        private static void killPeer(Peer landmarkPeer) throws RemoteException, AlreadyRegisteredException{
             Peer nextPeer = landmarkPeer;
             boolean verif = false;
              Identifier id = new Identifier(600);
@@ -159,7 +156,6 @@ public class Main {
                     if(nextPeer.getId().equals(id)){
                         System.out.println(nextPeer.getId());
                         nextPeer.die();
-                        //tracker.delPeer(nextPeer);
                         System.out.println("Mort");
                         
                         verif = true;
@@ -167,14 +163,16 @@ public class Main {
                } while ((verif != true));
             
         }
-          private static void listePeer(Peer landmarkPeer) throws RemoteException{
-            Peer nextPeer = landmarkPeer;
-            do {
-                        nextPeer = nextPeer.getSuccessor();
-                        System.out.println(nextPeer.describe());
-               } while ((!nextPeer.equals(landmarkPeer)));
-        }
-           private static void serialization(Peer landmarkPeer) throws RemoteException, IOException, FileNotFoundException, ClassNotFoundException{
+        private static void afficherPeer(Peer landmarkPeer) throws RemoteException {
+		Peer nextPeer = landmarkPeer;
+
+		do {
+			nextPeer = nextPeer.getSuccessor();
+			System.out.println("ok");
+
+		} while (!nextPeer.equals(landmarkPeer));
+	}
+         private static void serialization(Peer landmarkPeer) throws RemoteException, IOException, FileNotFoundException, ClassNotFoundException{
             Peer nextPeer = landmarkPeer;
             do {
                         nextPeer = nextPeer.getSuccessor();
