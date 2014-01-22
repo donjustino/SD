@@ -88,15 +88,11 @@ public class Main {
                         System.out.println("\nRestaurant '" + restaurant + "' - Daily special: '"
                                         + guideMichelin.get(restaurant) + "'");
                 }
-                Peer nextPeer = tracker.getRandomPeer();
-                //sauvegarde replicat 
-                do {
-                        nextPeer = nextPeer.getSuccessor();
-                        nextPeer.saveReplicat();
+             
          
-                } while (!nextPeer.equals(tracker.getRandomPeer()));
                 setReplicat(tracker.getRandomPeer());
                 update(tracker.getRandomPeer());
+                System.out.println("Vérification des réplicats...OK");
                 update(tracker.getRandomPeer());
                 cherche(tracker.getRandomPeer());
                 mort(tracker.getRandomPeer());
