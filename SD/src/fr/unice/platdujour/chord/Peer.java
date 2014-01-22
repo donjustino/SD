@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This interface declares the main operations that a peer sustain. A peer is 
@@ -134,5 +136,8 @@ public interface Peer extends Remote {
     public void update() throws RemoteException;
 
     public boolean chercheValeurKeyReplicat(String recherche) throws RemoteException;
-    
+  
+     public Map<String, String> getDirectory() throws RemoteException;
+
+    public void setDirectory(Map<String, String> directoryReplicat) throws RemoteException;
 }

@@ -4,6 +4,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import fr.unice.platdujour.exceptions.AlreadyRegisteredException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This interface defines the API of a tracker. It is supposed to keep track 
@@ -28,6 +30,8 @@ public interface Tracker extends Remote {
     Peer getRandomPeer() throws RemoteException;
     
     public boolean delPeer(Peer peer) throws RemoteException;
-    
-     public void regenerationDesDonnees() throws RemoteException;
+
+    public void RestaureData(Map<String, String> directoryReplicat)  throws RemoteException;
+
+
 }

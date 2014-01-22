@@ -10,6 +10,8 @@ import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
@@ -32,7 +34,7 @@ Peer {
 
 	/** Local storage for entries that have an identifier that is managed by  
 	 * the peer */
-	private final Map<String, String> directory;
+	private Map<String, String> directory;
 
 	/** Peer that is just before in the virtual ring */
 	private Peer predecessor;
@@ -53,11 +55,11 @@ Peer {
         
         ScheduledExecutorService threadPool;
 
-        private final Map<String, String> directoryReplicat;
+        private Map<String, String> directoryReplicat;
  
         
         Peer replicatsuccessor;
-        
+   
         public static int nbReplicat = 2;
         
         private String[][] tabReplicat = new String[nbReplicat][2]; 
@@ -89,11 +91,13 @@ Peer {
 						PeerImpl.this.successor.setPredecessor(PeerImpl.this);
 						PeerImpl.this.predecessor.setSuccessorofSuccessor(PeerImpl.this.successor);
 						System.out.println(PeerImpl.this.describe());
-                                                PeerImpl.this.tracker.regenerationDesDonnees();
+                                                PeerImpl.this.tracker.RestaureData(PeerImpl.this.directoryReplicat);
 						
 					}catch (RemoteException et) {
 						et.printStackTrace();
-					}
+					} catch (IOException ex) {
+                                        Logger.getLogger(PeerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
 				}
 			}
 		};
@@ -105,7 +109,9 @@ Peer {
 		// The bootstrap of the Chord network requires a self loop
 		this.successor = this;
 	}
-
+         public Map<String,String> getDatas() throws RemoteException{
+		return this.directory;
+	}
 	/**
 	 * {@inheritDoc}
 	 */
@@ -269,6 +275,7 @@ Peer {
 	public synchronized void put(String restaurant, String dailySpecial)
 			throws RemoteException {
 		this.directory.put(restaurant, dailySpecial);
+                
 	}
 
 	/**
@@ -371,21 +378,38 @@ Peer {
 
     @Override
         public void update() throws RemoteException{
-            for(int i = 0 ; i < nbReplicat ; i++){
-                 if(!tabReplicat[i][0].equals(this.successor.returnKey())){
+            /*for(int i = 0 ; i < nbReplicat ; i++){
+                
+            }*/
+            
+            int i = 0;
+            Peer nextPeer = this;
+            do{
+            
+                
+                 if(!tabReplicat[i][0].equals(nextPeer.getSuccessor().returnKey())){
                      //System.out.println("Test :" + tabReplicat[i][0] + this.successor.returnKey());
                      //System.out.println("Le sucesseur à change sa cléf" + this.successor.returnKey() + ", mise à jour... ");
-                     tabReplicat[i][0] = this.successor.returnKey();
+                     tabReplicat[i][0] = nextPeer.getSuccessor().returnKey();
                      //System.out.println("Mise à jour OK, nouvelle key : " + tabReplicat[i][0]);   
                      System.out.println("Mise à jour des réplicats faites...");
                  }
-                 if(!tabReplicat[i][1].equals(this.successor.returnValue())){
+                 if(!tabReplicat[i][1].equals(nextPeer.getSuccessor().returnValue())){
                       //System.out.println("Le sucesseur à change sa valeur" + this.returnValue() + ", mise à jour... ");
-                      tabReplicat[i][1] =  this.successor.returnValue();
+                      tabReplicat[i][1] =  nextPeer.getSuccessor().returnValue();
                        //System.out.println("Mise à jour OK, nouvelle valeur : " + tabReplicat[i][1]);   
                       System.out.println("Mise à jour des réplicats faites...");
                  }
-            }
+                
+                
+                i = i + 1; 
+                   
+                nextPeer = nextPeer.getSuccessor();
+            }while(i != nbReplicat);
+            
+            
+            
+            this.directoryReplicat = this.getSuccessor().getDirectory();
          }
 
     @Override
@@ -400,5 +424,14 @@ Peer {
             return false;
         
     }
-	
-}
+      public Map<String, String> getDirectory() throws RemoteException {
+		return this.directory;
+	}
+
+
+    @Override
+    public void setDirectory(Map<String, String> directoryReplicat) {
+        this.directory = directoryReplicat;
+    }
+
+  }

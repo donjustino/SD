@@ -1,5 +1,6 @@
 package fr.unice.platdujour.chord;
 
+import static fr.unice.platdujour.chord.PeerImpl.nbReplicat;
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
@@ -11,6 +12,11 @@ import java.util.List;
 import java.util.Random;
 
 import fr.unice.platdujour.exceptions.AlreadyRegisteredException;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class implements the {@link Tracker} interface. This implementation 
@@ -27,9 +33,10 @@ public class TrackerImpl extends UnicastRemoteObject implements Tracker {
     /** Used for random picking in the peer list*/
     private final Random randomGenerator;
 
-    
+    private List successeurMort = new LinkedList();
     public TrackerImpl(int port) throws RemoteException, MalformedURLException,
             AlreadyBoundException {
+       
         this.peers = new ArrayList<Peer>();
         this.randomGenerator = new Random();
         // The tracker is a remotely accessible object: bind it to an RMI 
@@ -67,22 +74,24 @@ public class TrackerImpl extends UnicastRemoteObject implements Tracker {
 		return this.peers.remove(peer);
 		
     }
-    public void ComptabilisationDesDonnees() throws RemoteException {
-		
-		Peer depart = this.getRandomPeer();
-                Peer nextPeer = this.getRandomPeer();
+    public void RestaureData(Map<String, String> directoryReplicat)  throws RemoteException{
+           
+              Peer landmarkPeer = this.getRandomPeer();
+              Peer nextPeer = landmarkPeer;
 
 		do {
-			nextPeer = nextPeer.getSuccessor();
-			System.out.println("Valeur : " + nextPeer.describe());
+                     System.out.println(directoryReplicat.toString());
+                     if(nextPeer.getDirectory().equals("{}")){
+                         nextPeer.setDirectory(directoryReplicat);
+                         System.out.println(nextPeer.getDirectory());
+                     }
+                     
+                        
 
-		} while (!nextPeer.equals(depart));
-                
-	}
-
-    @Override
-    public void regenerationDesDonnees() throws RemoteException {
-           System.out.println(("Coming soon::"));
+		nextPeer = nextPeer.getSuccessor();
+		} while (!nextPeer.equals(landmarkPeer));
+            
+            
     }
 
 }
