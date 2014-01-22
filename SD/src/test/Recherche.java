@@ -11,7 +11,10 @@ import fr.unice.platdujour.chord.Peer;
 import fr.unice.platdujour.chord.Tracker;
 import java.rmi.RemoteException;
 public class Recherche {
-
+    /**
+     * Méthode qui démontre l'accélérateur de recherche via les replicats 
+     *
+     */
     public static void testRecherche(Peer landmarkPeer) throws RemoteException{
         Peer nextPeer = landmarkPeer;
         boolean verif = false;

@@ -76,12 +76,19 @@ public class TrackerImpl extends UnicastRemoteObject implements Tracker {
 
         return this.peers.get(this.randomGenerator.nextInt(this.peers.size()));
     }
-
+     /**
+     * Méthode qui permet de supprimer un peer du tracker
+     *
+     */
     @Override
     public synchronized boolean delPeer(Peer peer) throws RemoteException {
         return this.peers.remove(peer);
 
     }
+     /**
+     * Méthode qui permet de redéfinr un peer avec un directory vide, le directory d'un Peer mort
+     *
+     */
 
     public void restoreData(Map<String, String> directoryReplicat) throws RemoteException {
         boolean verif = false;

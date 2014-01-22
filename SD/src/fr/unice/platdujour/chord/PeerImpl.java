@@ -1,17 +1,10 @@
 package fr.unice.platdujour.chord;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
@@ -61,36 +54,32 @@ public class PeerImpl extends UnicastRemoteObject implements Comparable<Peer>,
      * Création d'un objet tracker
      */
     Tracker tracker;
-    
+
     /**
      * Thread
-     * 
      *
-     */ 
+     *
+     */
     ScheduledExecutorService threadPool;
 
-    
     /**
      * Copie du directory du sucesseur
-     * 
-     */
-    
-    private Map<String, String> directoryReplicat;
-
-    
-    /**
-     * Variable qui permet de définir le nombre de réplicat qu'un peer peut stocker
-     * 
-     */
-    
-    public static int nbReplicat = 2;
-    
-    
-    /**
-     * Tableau à deux dimensions qui permet de stocker les replicats (une colonne pour les key une autres pour les values)
      *
      */
-    
+    private Map<String, String> directoryReplicat;
+
+    /**
+     * Variable qui permet de définir le nombre de réplicat qu'un peer peut
+     * stocker
+     *
+     */
+    public static int nbReplicat = 2;
+
+    /**
+     * Tableau à deux dimensions qui permet de stocker les replicats (une
+     * colonne pour les key une autres pour les values)
+     *
+     */
     private String[][] tabReplicat = new String[nbReplicat][2];
 
     public PeerImpl(Identifier id) throws RemoteException {
@@ -108,7 +97,7 @@ public class PeerImpl extends UnicastRemoteObject implements Comparable<Peer>,
             @Override
             public void run() {
                 try {
-					// The stabilize method is called periodically to update 
+                    // The stabilize method is called periodically to update 
                     // the successor and predecessor links of the peer
                     PeerImpl.this.stabilize();
 
@@ -139,15 +128,13 @@ public class PeerImpl extends UnicastRemoteObject implements Comparable<Peer>,
         this.successor = this;
     }
 
- 
-
     /**
      * {@inheritDoc}
      */
     @Override
     public synchronized void join(Peer landmarkPeer) throws RemoteException {
         this.predecessor = null;
-		// To join the network, ask a peer that is already in the network to 
+        // To join the network, ask a peer that is already in the network to 
         // find which peer must be the successor of the joining peer, using 
         // the identifier of the joining peer
         this.successor = landmarkPeer.findSuccessor(this.id);
@@ -163,7 +150,7 @@ public class PeerImpl extends UnicastRemoteObject implements Comparable<Peer>,
         if (this.successor.equals(this)) {
             return this;
         }
-		// The specified identifier is in between the current peer identifier 
+        // The specified identifier is in between the current peer identifier 
         // and the successor identifier: the successor is then the peer we are 
         // looking for
         if (id.isBetweenOpenClosed(this.id, this.successor.getId())) {
@@ -255,7 +242,7 @@ public class PeerImpl extends UnicastRemoteObject implements Comparable<Peer>,
      */
     @Override
     public synchronized void stabilize() throws RemoteException {
-		// x should be this itself, but it is not always the case, typically 
+        // x should be this itself, but it is not always the case, typically 
         // if the successor has recently taken a new peer as predecessor
         //System.out.println("On peer "+ this.getId());
         Peer x = null;
@@ -265,7 +252,7 @@ public class PeerImpl extends UnicastRemoteObject implements Comparable<Peer>,
             System.err.println("Objet succeseur mort");
         }
 
-		// If x is this itself, then this condition is not valid. This 
+        // If x is this itself, then this condition is not valid. This 
         // condition is valid if the successor has another peer as predecessor,
         // then in this case we check if this other peer is indeed included in 
         // the current identifier and the identifier of the successor. If it 
@@ -275,7 +262,7 @@ public class PeerImpl extends UnicastRemoteObject implements Comparable<Peer>,
             this.successor = x;
         }
         this.successorofsuccessor = this.successor.getSuccessor();
-		// The current peer needs to inform its successor that it is indeed its
+        // The current peer needs to inform its successor that it is indeed its
         // successor 
         this.successor.notify(PeerImpl.this);
     }
@@ -285,7 +272,7 @@ public class PeerImpl extends UnicastRemoteObject implements Comparable<Peer>,
      */
     @Override
     public synchronized void notify(Peer peer) throws RemoteException {
-		// If a new peer notify itself as a predecessor of the current peer, 
+        // If a new peer notify itself as a predecessor of the current peer, 
         // check if it fits in the interval of the previous predecessor 
         // identifier and it own identifier. If yes, take it as predecessor.
         // Otherwise, nothing needs to be done.
@@ -340,7 +327,7 @@ public class PeerImpl extends UnicastRemoteObject implements Comparable<Peer>,
      * {@inheritDoc}
      */
     public void die() throws RemoteException {
-		// Removes this from the RMI runtime. It will prevent all RMI calls 
+        // Removes this from the RMI runtime. It will prevent all RMI calls 
         // from executing on this object. A further RMI call on this will 
         // cause a java.rmi.NoSuchObjectException.
         threadPool.shutdown();
@@ -348,16 +335,15 @@ public class PeerImpl extends UnicastRemoteObject implements Comparable<Peer>,
 
         System.out.println("Peer with id " + this.id + " has died.");
     }
-    
+
     /**
-     * Défini le sucesseur du sucesseur 
-     * 
+     * Défini le sucesseur du sucesseur
+     *
      */
     public void setSuccessorofSuccessor(Peer peer) throws RemoteException {
         this.successorofsuccessor = peer;
     }
 
-    
     public Tracker getTracker() throws RemoteException {
         return tracker;
     }
@@ -365,10 +351,10 @@ public class PeerImpl extends UnicastRemoteObject implements Comparable<Peer>,
     public void setTracker(Tracker tracker) throws RemoteException {
         this.tracker = tracker;
     }
-    
+
     /**
      * Retourne la clef d'un peer
-     * peer
+     *
      */
     public String returnKey() throws RemoteException {
         StringBuilder s = new StringBuilder();
@@ -381,10 +367,9 @@ public class PeerImpl extends UnicastRemoteObject implements Comparable<Peer>,
         return s.toString();
     }
 
-    
     /**
      * Retourne la valeur d'un Peer
-     * 
+     *
      */
     public String returnValue() throws RemoteException {
         StringBuilder s = new StringBuilder();
@@ -396,10 +381,10 @@ public class PeerImpl extends UnicastRemoteObject implements Comparable<Peer>,
         }
         return s.toString();
     }
-    
+
     /**
-     * Méthode qui sauvegarde les replicats des successeurs 
-     * 
+     * Méthode qui sauvegarde les replicats des successeurs
+     *
      */
     public void saveReplicat() throws RemoteException {
         Peer temp = this.successor;
@@ -409,16 +394,11 @@ public class PeerImpl extends UnicastRemoteObject implements Comparable<Peer>,
             tabReplicat[i][1] = temp.returnValue();
             temp = temp.getSuccessor();
         }
-
-        /* for(int i = 0; i < tabReplicat.length; i++){
-         System.out.println("Key : " + tabReplicat[i][0] + " Value : " + tabReplicat[i][1]);
-         } */
     }
 
-    
     /**
-     * Affiche sur la console les replicats 
-     * 
+     * Affiche sur la console les replicats
+     *
      */
     public void printReplicat() throws RemoteException {
         System.out.println(this.describe());
@@ -427,13 +407,10 @@ public class PeerImpl extends UnicastRemoteObject implements Comparable<Peer>,
         }
         System.out.println("");
     }
-   
-    
+
     /**
-     * Méthode qui met à jour les replicats 
-     * peer
+     * Méthode qui met à jour les replicats peer
      */
-    
     @Override
     public void update() throws RemoteException {
         /*for(int i = 0 ; i < nbReplicat ; i++){
@@ -445,16 +422,11 @@ public class PeerImpl extends UnicastRemoteObject implements Comparable<Peer>,
         do {
 
             if (!tabReplicat[i][0].equals(nextPeer.getSuccessor().returnKey())) {
-                     //System.out.println("Test :" + tabReplicat[i][0] + this.successor.returnKey());
-                //System.out.println("Le sucesseur à change sa cléf" + this.successor.returnKey() + ", mise à jour... ");
                 tabReplicat[i][0] = nextPeer.getSuccessor().returnKey();
-                //System.out.println("Mise à jour OK, nouvelle key : " + tabReplicat[i][0]);   
                 System.out.println("Mise à jour des réplicats faites...");
             }
             if (!tabReplicat[i][1].equals(nextPeer.getSuccessor().returnValue())) {
-                //System.out.println("Le sucesseur à change sa valeur" + this.returnValue() + ", mise à jour... ");
                 tabReplicat[i][1] = nextPeer.getSuccessor().returnValue();
-                //System.out.println("Mise à jour OK, nouvelle valeur : " + tabReplicat[i][1]);   
                 System.out.println("Mise à jour des réplicats faites...");
             }
 
@@ -465,12 +437,11 @@ public class PeerImpl extends UnicastRemoteObject implements Comparable<Peer>,
 
         this.directoryReplicat = this.getSuccessor().getDirectory();
     }
-    
+
     /**
-     * Méthode qui retourne la valeur d'une clé des replicats   
-     * 
+     * Méthode qui retourne la valeur d'une clé des replicats
+     *
      */
-    
     @Override
     public boolean chercheValeurKeyReplicat(String recherche) throws RemoteException {
         for (int i = 0; i < tabReplicat.length; i++) {
@@ -483,20 +454,19 @@ public class PeerImpl extends UnicastRemoteObject implements Comparable<Peer>,
         return false;
 
     }
-    
+
     /**
      * Méthode qui retourne le directory d'un Peeer
-     * 
+     *
      */
     public Map<String, String> getDirectory() throws RemoteException {
         return this.directory;
     }
-    
-    /**
-     * Méthode quidéfinit un Directory passé en paramètres
-     * 
-     */
 
+    /**
+     * Méthode quidéfinit un Directory passé en
+     *
+     */
     @Override
     public void setDirectory(Map<String, String> directoryReplicat) {
         this.directory = directoryReplicat;

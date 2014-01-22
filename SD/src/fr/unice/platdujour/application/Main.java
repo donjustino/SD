@@ -98,17 +98,15 @@ public class Main {
         System.out.println("Vérification des réplicats...OK");
         // révérification des réplicats 
         tracker.getRandomPeer().update();
-        
-        
-        
-    /**
-     *              /!\ TEST /!\
-     * 
-     */
-        Recherche.testRecherche(tracker.getRandomPeer()); 
-        //test.TestCoherance.test(tracker.getRandomPeer());
+
+        /**
+         *              /!\ TEST /!\
+         *
+         */
+        Recherche.testRecherche(tracker.getRandomPeer());
+        test.TestCoherance.test(tracker.getRandomPeer());
         Mort.test(tracker.getRandomPeer());
-      
+
     }
 
     /**
@@ -129,7 +127,7 @@ public class Main {
                 p.create();
                 p.setTracker(tracker);
             } else {
-                                // The new peer is inserted in the network using a random peer 
+                // The new peer is inserted in the network using a random peer 
                 // that already belongs to the network. This random peer is 
                 // retrieved thanks to the tracker.
                 Peer randomPeer = tracker.getRandomPeer();
@@ -163,13 +161,12 @@ public class Main {
 
         } while (!nextPeer.equals(landmarkPeer));
     }
-    
+
     /**
-     * Intialise les réplicats 
-     * 
+     * Intialise les réplicats
+     *
      *
      */
-    
     private static void setReplicat(Peer landmarkPeer) throws RemoteException {
         Peer nextPeer = landmarkPeer;
         do {
