@@ -98,10 +98,7 @@ public class Main {
 
 		} while (!nextPeer.equals(tracker.getRandomPeer()));
                
-                
-                
-                
-                Recherche.testRecherche(tracker.getRandomPeer());
+                //Recherche.testRecherche(tracker.getRandomPeer());
                 /*
                 nextPeer = tracker.getRandomPeer();
 

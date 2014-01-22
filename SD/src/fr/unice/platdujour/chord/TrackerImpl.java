@@ -69,13 +69,14 @@ public class TrackerImpl extends UnicastRemoteObject implements Tracker {
     }
     public void regenerationDesDonnees() throws RemoteException {
 		
-		Peer nextPeer = this.getRandomPeer();
+		Peer depart = this.getRandomPeer();
+                Peer nextPeer = this.getRandomPeer();
 
 		do {
 			nextPeer = nextPeer.getSuccessor();
 			System.out.println("Valeur : " + nextPeer.describe());
 
-		} while (!nextPeer.equals(this.getRandomPeer()));
+		} while (!nextPeer.equals(depart));
                 
 	}
 

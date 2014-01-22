@@ -60,7 +60,7 @@ Peer {
         
         static int nbReplicat = 2;
         
-        
+        String[][] tabReplicat = new String[nbReplicat][2]; 
 	public PeerImpl(Identifier id) throws RemoteException {
 		this.id = id;
 		this.predecessor = this;
@@ -360,6 +360,7 @@ Peer {
 			throws RemoteException {
 		this.directoryReplicat.put(restaurant, dailyNews);
 		return this.directoryReplicat.get(restaurant) != null;
+                
 		
 	}
 
@@ -412,10 +413,15 @@ Peer {
           Peer temp = this.successor;
 		
 		for(int i = 0 ; i < nbReplicat ; i++){
-			this.putReplicat(temp.returnKey(),temp.returnValue());
+                        tabReplicat[i][0] =  temp.returnKey();
+                        tabReplicat[i][1] =  temp.returnValue();
 			temp = temp.getSuccessor();
 		}
-		
+	
+             for(int i = 0; i < tabReplicat.length; i++){
+                    System.out.println("Key : " + tabReplicat[i] + " Value : " + tabReplicat[1]);
+            }
+
         }
        
         public void printReplicat() throws RemoteException{
