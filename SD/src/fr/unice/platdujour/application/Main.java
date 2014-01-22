@@ -91,11 +91,20 @@ public class Main {
             System.out.println("\nRestaurant '" + restaurant + "' - Daily special: '"
                     + guideMichelin.get(restaurant) + "'");
         }
-
+        // Défini les réplicasts 
         setReplicat(tracker.getRandomPeer());
+        // Met à jour les réplicats 
         tracker.getRandomPeer().update();
         System.out.println("Vérification des réplicats...OK");
+        // révérification des réplicats 
         tracker.getRandomPeer().update();
+        
+        
+        
+    /**
+     *              /!\ TEST /!\
+     * 
+     */
         Recherche.testRecherche(tracker.getRandomPeer()); 
         //test.TestCoherance.test(tracker.getRandomPeer());
         Mort.test(tracker.getRandomPeer());
@@ -154,7 +163,13 @@ public class Main {
 
         } while (!nextPeer.equals(landmarkPeer));
     }
-
+    
+    /**
+     * Intialise les réplicats 
+     * 
+     *
+     */
+    
     private static void setReplicat(Peer landmarkPeer) throws RemoteException {
         Peer nextPeer = landmarkPeer;
         do {
