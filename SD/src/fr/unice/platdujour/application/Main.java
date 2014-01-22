@@ -13,6 +13,7 @@ import fr.unice.platdujour.chord.TrackerImpl;
 import fr.unice.platdujour.exceptions.AlreadyRegisteredException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import test.Recherche;
 
 /**
  * This class defines a main in which
@@ -25,7 +26,7 @@ import java.io.IOException;
  * 7) some data are requested from the {@link GuideMichelin}
  */
 public class Main {
-	
+	static GuideMichelin guideMichelin;
 	/** Number of peers that will be injected in the network */
 	private static final int NB_PEERS = 10; 
 	
@@ -63,7 +64,7 @@ public class Main {
 		turnAround(tracker.getRandomPeer());
 
 		// A GuideMichelin is created. It will use the Chord network
-		GuideMichelin guideMichelin = new GuideMichelinImpl(tracker);
+		guideMichelin = new GuideMichelinImpl(tracker);
 
 		// Some data are added to the {@link GuideMichelin}
 		DataGenerator dataGenerator = new DataGenerator(10);
@@ -88,12 +89,30 @@ public class Main {
 			System.out.println("\nRestaurant '" + restaurant + "' - Daily special: '"
 					+ guideMichelin.get(restaurant) + "'");
 		}
-                serialization(tracker.getRandomPeer());
-                killPeer(tracker.getRandomPeer()); 
-                int i = 0;
-                while(i !=0){
-                    afficherPeer(tracker.getRandomPeer());
-                }
+                Peer nextPeer = tracker.getRandomPeer();
+                //sauvegarde replicat 
+		do {
+			nextPeer = nextPeer.getSuccessor();
+			nextPeer.saveReplicat();
+                        nextPeer.printReplicat();
+
+		} while (!nextPeer.equals(tracker.getRandomPeer()));
+               
+                
+                
+                
+                Recherche.testRecherche(tracker.getRandomPeer());
+                /*
+                nextPeer = tracker.getRandomPeer();
+
+		do {
+			nextPeer = nextPeer.getSuccessor();
+			nextPeer.update();
+
+		} while (!nextPeer.equals(tracker.getRandomPeer()));
+                //serialization(tracker.getRandomPeer());
+                //killPeer(tracker.getRandomPeer()); 
+               */
 	}
 
 	/**
@@ -180,4 +199,7 @@ public class Main {
                         nextPeer.deserialization();
                } while ((!nextPeer.equals(landmarkPeer)));
         }
+public static GuideMichelin getGuideMichelin() {
+		return guideMichelin;
+	}
 }

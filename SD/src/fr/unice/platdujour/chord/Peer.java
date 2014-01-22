@@ -127,4 +127,21 @@ public interface Peer extends Remote {
      
     public void deserialization() throws RemoteException, FileNotFoundException, IOException, ClassNotFoundException;
     
+    public boolean putReplicat(String restaurant, String dailyNews) throws RemoteException;
+    
+    public String getReplicat(String restaurant) throws RemoteException;
+            
+    public String returnKey() throws RemoteException;
+    
+    public String returnValue() throws RemoteException;
+    
+     public String returnKeyReplicat() throws RemoteException;
+    
+    public String returnValueReplicat() throws RemoteException;
+    
+    public void saveReplicat() throws RemoteException;
+
+    public void printReplicat() throws RemoteException;
+    
+    public void update() throws RemoteException;
 }

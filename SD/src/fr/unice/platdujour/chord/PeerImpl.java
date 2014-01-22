@@ -54,8 +54,12 @@ Peer {
         ScheduledExecutorService threadPool;
 
         private final Map<String, String> directoryReplicat;
+ 
         
         Peer replicatsuccessor;
+        
+        static int nbReplicat = 2;
+        
         
 	public PeerImpl(Identifier id) throws RemoteException {
 		this.id = id;
@@ -79,16 +83,13 @@ Peer {
 						
 				} catch (RemoteException e) {
 					try{
-					System.out.println("Remove effectué = " + PeerImpl.this.tracker.delPeer(PeerImpl.this.successor));
+					System.out.println("Succeseur mort, suppression... " + PeerImpl.this.tracker.delPeer(PeerImpl.this.successor));
 						PeerImpl.this.successor = PeerImpl.this.successorofsuccessor;
 						PeerImpl.this.successorofsuccessor = PeerImpl.this.successor.getSuccessor();
 						PeerImpl.this.successor.setPredecessor(PeerImpl.this);
 						PeerImpl.this.predecessor.setSuccessorofSuccessor(PeerImpl.this.successor);
 						System.out.println(PeerImpl.this.describe());
-						
-						//PeerImpl.this.tracker.dataRecovery();
-				
-					//System.out.println(PeerImpl.this.describe());
+                                                PeerImpl.this.tracker.regenerationDesDonnees();
 						
 					}catch (RemoteException et) {
 						et.printStackTrace();
@@ -351,5 +352,91 @@ Peer {
         ois.close();
         fichier.close();
     }
+    /**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean putReplicat(String restaurant, String dailyNews)
+			throws RemoteException {
+		this.directoryReplicat.put(restaurant, dailyNews);
+		return this.directoryReplicat.get(restaurant) != null;
+		
+	}
+
+	public String returnKey() throws RemoteException {
+		StringBuilder s = new StringBuilder();
+
+		int cpt = 0;
+		int size = this.directory.size();
+		for (Entry<String,String> entry : this.directory.entrySet()) {
+			s.append(entry.getKey());
+		}
+                return s.toString();
+	}
+        public String returnValue() throws RemoteException {
+		StringBuilder s = new StringBuilder();
+
+		int cpt = 0;
+		int size = this.directory.size();
+		for (Entry<String,String> entry : this.directory.entrySet()) {
+			s.append(entry.getValue());
+		}
+                return s.toString();
+	}
         
+        
+        
+       public String returnKeyReplicat() throws RemoteException {
+		StringBuilder s = new StringBuilder();
+
+		int cpt = 0;
+		int size = this.directory.size();
+		for (Entry<String,String> entry : this.directory.entrySet()) {
+			s.append(entry.getKey());
+		}
+                return s.toString();
+	}
+        public String returnValueReplicat() throws RemoteException {
+		StringBuilder s = new StringBuilder();
+
+		int cpt = 0;
+		int size = this.directory.size();
+		for (Entry<String,String> entry : this.directory.entrySet()) {
+			s.append(entry.getValue());
+		}
+                return s.toString();
+	} 
+        
+        
+        public void saveReplicat() throws RemoteException{
+          Peer temp = this.successor;
+		
+		for(int i = 0 ; i < nbReplicat ; i++){
+			this.putReplicat(temp.returnKey(),temp.returnValue());
+			temp = temp.getSuccessor();
+		}
+		
+        }
+       
+        public void printReplicat() throws RemoteException{
+         
+            System.out.println("Je suis " + this.getId()  + " Mes sauvegardes de replicat Key: " + this.directoryReplicat );
+        }
+
+    @Override
+        public void update() throws RemoteException{
+            if((this.returnValueReplicat() != this.successor.returnValue()) || (this.returnKeyReplicat() != this.successor.returnKey())) {
+                 System.out.println("Nouvelle valeur mise à jour... nouvelle valeur"); 
+                 this.putReplicat(this.successor.returnKey(),this.successor.returnValue());
+                 this.printReplicat(); 
+            }
+             
+        }
+       
+
+    @Override
+    public String getReplicat(String restaurant) throws RemoteException {
+       return this.directoryReplicat.get(restaurant);
+    }
+	
 }

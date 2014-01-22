@@ -28,4 +28,6 @@ public interface Tracker extends Remote {
     Peer getRandomPeer() throws RemoteException;
     
     public boolean delPeer(Peer peer) throws RemoteException;
+    
+     public void regenerationDesDonnees() throws RemoteException;
 }
