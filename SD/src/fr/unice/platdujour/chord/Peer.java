@@ -122,22 +122,10 @@ public interface Peer extends Remote {
     public Tracker getTracker() throws RemoteException;
 
     public void setTracker(Tracker tracker) throws RemoteException;
-    
-    public void serialization(Peer temp) throws RemoteException, FileNotFoundException, IOException;
-     
-    public void deserialization() throws RemoteException, FileNotFoundException, IOException, ClassNotFoundException;
-    
-    public boolean putReplicat(String restaurant, String dailyNews) throws RemoteException;
-    
-    public String getReplicat(String restaurant) throws RemoteException;
             
     public String returnKey() throws RemoteException;
     
     public String returnValue() throws RemoteException;
-    
-     public String returnKeyReplicat() throws RemoteException;
-    
-    public String returnValueReplicat() throws RemoteException;
     
     public void saveReplicat() throws RemoteException;
 
@@ -145,5 +133,6 @@ public interface Peer extends Remote {
     
     public void update() throws RemoteException;
 
-    public String chercheValeurKeyReplicat(String recherche) throws RemoteException;;
+    public boolean chercheValeurKeyReplicat(String recherche) throws RemoteException;
+    
 }

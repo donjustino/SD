@@ -8,19 +8,24 @@ package test;
 
 import fr.unice.platdujour.application.Main;
 import fr.unice.platdujour.chord.Peer;
-import static fr.unice.platdujour.chord.PeerImpl.tabReplicat;
 import fr.unice.platdujour.chord.Tracker;
 import java.rmi.RemoteException;
 public class Recherche {
 
     public static void testRecherche(Peer landmarkPeer) throws RemoteException{
         Peer nextPeer = landmarkPeer;
+        boolean verif = false;
+        System.out.println("Recherche pour le restaurant Clovis");
         String recherche = "Clovis";
+        
         do {
                         nextPeer = nextPeer.getSuccessor();
-                        nextPeer.chercheValeurKeyReplicat(recherche);
+                        if(nextPeer.chercheValeurKeyReplicat(recherche) == true){
+                             verif = true;
+                        }
+                        
                
                
-          } while((!nextPeer.equals(landmarkPeer))); 
+         } while((!nextPeer.equals(landmarkPeer)) || (verif != true)); 
     }
 }

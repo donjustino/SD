@@ -11,8 +11,7 @@ import fr.unice.platdujour.chord.PeerImpl;
 import fr.unice.platdujour.chord.Tracker;
 import fr.unice.platdujour.chord.TrackerImpl;
 import fr.unice.platdujour.exceptions.AlreadyRegisteredException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import test.Mort;
 import test.Recherche;
 
 /**
@@ -96,18 +95,11 @@ public class Main {
                         nextPeer.saveReplicat();
          
                 } while (!nextPeer.equals(tracker.getRandomPeer()));
+                setReplicat(tracker.getRandomPeer());
+                update(tracker.getRandomPeer());
+                update(tracker.getRandomPeer());
                 cherche(tracker.getRandomPeer());
-                /*
-                nextPeer = tracker.getRandomPeer();
-
-                do {
-                        nextPeer = nextPeer.getSuccessor();
-                        nextPeer.update();
-
-                } while (!nextPeer.equals(tracker.getRandomPeer()));
-                //serialization(tracker.getRandomPeer());
-                //killPeer(tracker.getRandomPeer()); 
-               */
+                mort(tracker.getRandomPeer());
         }
 
         /**
@@ -161,50 +153,36 @@ public class Main {
 
                 } while (!nextPeer.equals(landmarkPeer));
         }
-        private static void killPeer(Peer landmarkPeer) throws RemoteException, AlreadyRegisteredException{
-            Peer nextPeer = landmarkPeer;
-            boolean verif = false;
-             Identifier id = new Identifier(600);
-            do {
-                       nextPeer = nextPeer.getSuccessor();
-                    if(nextPeer.getId().equals(id)){
-                        System.out.println(nextPeer.getId());
-                        nextPeer.die();
-                        System.out.println("Mort");
-                        
-                        verif = true;
-               }               
-               } while ((verif != true));
-            
-        }
-        private static void afficherPeer(Peer landmarkPeer) throws RemoteException {
+        private static void mort(Peer landmarkPeer) throws RemoteException, AlreadyRegisteredException{
                 Peer nextPeer = landmarkPeer;
-
-                do {
-                        nextPeer = nextPeer.getSuccessor();
-                        System.out.println("ok");
-
-                } while (!nextPeer.equals(landmarkPeer));
-        }
-         private static void serialization(Peer landmarkPeer) throws RemoteException, IOException, FileNotFoundException, ClassNotFoundException{
-            Peer nextPeer = landmarkPeer;
-            do {
-                        nextPeer = nextPeer.getSuccessor();
-                        nextPeer.serialization(nextPeer.getSuccessor());
-                        nextPeer.deserialization();
-               } while ((!nextPeer.equals(landmarkPeer)));
+                Mort.test(nextPeer);
+            
         }
         private static void cherche(Peer landmarkPeer) throws RemoteException {
                 Peer nextPeer = landmarkPeer;
-
-                do {
-                        nextPeer = nextPeer.getSuccessor();
-                         
                 Recherche.testRecherche(nextPeer);
 
-                } while (!nextPeer.equals(landmarkPeer));
         }
-public static GuideMichelin getGuideMichelin() {
+          private static void setReplicat(Peer landmarkPeer) throws RemoteException {
+             Peer nextPeer = landmarkPeer;
+             do {
+                        nextPeer = nextPeer.getSuccessor();
+                        nextPeer.saveReplicat();
+                        
+               } while ((!nextPeer.equals(landmarkPeer)));
+
+        }
+    public static GuideMichelin getGuideMichelin() {
                 return guideMichelin;
         }
+
+    private static void update(Peer landmarkPeer) throws RemoteException {
+                     Peer nextPeer = landmarkPeer;
+             do {
+                        nextPeer = nextPeer.getSuccessor();
+                        nextPeer.update();
+                        
+               } while ((!nextPeer.equals(landmarkPeer)));
+        
+    }
 }

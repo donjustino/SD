@@ -7,18 +7,28 @@
 package test;
 
 import fr.unice.platdujour.application.Main;
+import fr.unice.platdujour.chord.Identifier;
+import fr.unice.platdujour.chord.Peer;
 import fr.unice.platdujour.chord.Tracker;
+import java.rmi.RemoteException;
 
 
 public class Mort {
-    static Tracker tracker;
-	public Mort(){
-		tracker = Main.getTracker();
-	}
         
-        public void mort(){
-            
-        }
+        public static void test(Peer landmarkPeer) throws RemoteException{
+            Peer nextPeer = landmarkPeer;
+            boolean verif = false;
+            Identifier id = new Identifier(600);
+            do {
+                   nextPeer = nextPeer.getSuccessor();
+                   if(nextPeer.getId().equals(id)){
+                        System.out.println(nextPeer.getId());
+                        nextPeer.die();
+                        System.out.println("Mort");
+                        verif = true;
+                    }               
+            } while ((verif != true));
+         }
 	
     
 }

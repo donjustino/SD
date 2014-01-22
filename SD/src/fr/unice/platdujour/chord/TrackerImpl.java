@@ -67,7 +67,7 @@ public class TrackerImpl extends UnicastRemoteObject implements Tracker {
 		return this.peers.remove(peer);
 		
     }
-    public void regenerationDesDonnees() throws RemoteException {
+    public void ComptabilisationDesDonnees() throws RemoteException {
 		
 		Peer depart = this.getRandomPeer();
                 Peer nextPeer = this.getRandomPeer();
@@ -79,5 +79,10 @@ public class TrackerImpl extends UnicastRemoteObject implements Tracker {
 		} while (!nextPeer.equals(depart));
                 
 	}
+
+    @Override
+    public void regenerationDesDonnees() throws RemoteException {
+           System.out.println(("Coming soon::"));
+    }
 
 }

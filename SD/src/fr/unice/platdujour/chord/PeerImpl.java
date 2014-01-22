@@ -60,7 +60,7 @@ Peer {
         
         public static int nbReplicat = 2;
         
-        public static String[][] tabReplicat = new String[nbReplicat][2]; 
+        private String[][] tabReplicat = new String[nbReplicat][2]; 
 	public PeerImpl(Identifier id) throws RemoteException {
 		this.id = id;
 		this.predecessor = this;
@@ -228,7 +228,7 @@ Peer {
 		try{
 			x = this.successor.getPredecessor();
 		}catch(NoSuchObjectException e){
-			System.err.println("no object successor");
+			System.err.println("Objet succeseur mort");
 		}
 
 		// If x is this itself, then this condition is not valid. This 
@@ -324,46 +324,7 @@ Peer {
 	public void setTracker(Tracker tracker) throws RemoteException {
 		this.tracker = tracker;
 	}
-
-    @Override
-    public void serialization(Peer temp) throws RemoteException, FileNotFoundException, IOException {
-        FileOutputStream fichier = new FileOutputStream("peer"+this.getId()+".ser");
-        ObjectOutputStream oos = new ObjectOutputStream(fichier);
-        oos.writeObject(temp);
-        oos.flush();
-        oos.close();
-            try {
-                this.deserialization();
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(PeerImpl.class.getName()).log(Level.SEVERE, null, ex);
-            }
-    }
-
-    @Override
-    public void deserialization() throws RemoteException, FileNotFoundException, IOException, ClassNotFoundException {
-      FileInputStream fichier = new FileInputStream("peer"+this.getId()+".ser");
-        ObjectInputStream ois = new ObjectInputStream(fichier);
-        this.replicatsuccessor = (Peer) ois.readObject();
-        System.out.println("Sauvegarde peer :" + this.replicatsuccessor.describe());
-        //this.successor = this.replicatsuccessor.getSuccessor();
-        //System.out.println("Ce peer" + this.describe());
-        //System.out.println("Le replicat :" + this.replicatsuccessor.describe());
-        //this.successor.setPredecessor(this.replicatsuccessor.getPredecessor());
-        ois.close();
-        fichier.close();
-    }
-    /**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean putReplicat(String restaurant, String dailyNews)
-			throws RemoteException {
-		this.directoryReplicat.put(restaurant, dailyNews);
-		return this.directoryReplicat.get(restaurant) != null;
-                
-		
-	}
-
+        
 	public String returnKey() throws RemoteException {
 		StringBuilder s = new StringBuilder();
 
@@ -385,30 +346,6 @@ Peer {
                 return s.toString();
 	}
         
-        
-        
-       public String returnKeyReplicat() throws RemoteException {
-		StringBuilder s = new StringBuilder();
-
-		int cpt = 0;
-		int size = this.directory.size();
-		for (Entry<String,String> entry : this.directory.entrySet()) {
-			s.append(entry.getKey());
-		}
-                return s.toString();
-	}
-        public String returnValueReplicat() throws RemoteException {
-		StringBuilder s = new StringBuilder();
-
-		int cpt = 0;
-		int size = this.directory.size();
-		for (Entry<String,String> entry : this.directory.entrySet()) {
-			s.append(entry.getValue());
-		}
-                return s.toString();
-	} 
-        
-        
         public void saveReplicat() throws RemoteException{
                 Peer temp = this.successor;
 		
@@ -418,43 +355,49 @@ Peer {
 			temp = temp.getSuccessor();
 		}
 	
-             for(int i = 0; i < tabReplicat.length; i++){
+            /* for(int i = 0; i < tabReplicat.length; i++){
                     System.out.println("Key : " + tabReplicat[i][0] + " Value : " + tabReplicat[i][1]);
-            } 
+            } */
 
         }
        
         public void printReplicat() throws RemoteException{
-            //System.out.println("Key : " + tabReplicat[i][0] + " Value : " + tabReplicat[i][1]);
-        }
+            System.out.println(this.describe());
+            for(int i = 0; i < tabReplicat.length; i++){
+              System.out.println("Key : " + tabReplicat[i][0] + " Value : " + tabReplicat[i][1]);
+           }
+           System.out.println("");
+          }
 
     @Override
         public void update() throws RemoteException{
-            if((this.returnValueReplicat() != this.successor.returnValue()) || (this.returnKeyReplicat() != this.successor.returnKey())) {
-                 System.out.println("Nouvelle valeur mise à jour... nouvelle valeur"); 
-                 this.putReplicat(this.successor.returnKey(),this.successor.returnValue());
-                 this.printReplicat(); 
+            for(int i = 0 ; i < nbReplicat ; i++){
+                 if(!tabReplicat[i][0].equals(this.successor.returnKey())){
+                     //System.out.println("Test :" + tabReplicat[i][0] + this.successor.returnKey());
+                     //System.out.println("Le sucesseur à change sa cléf" + this.successor.returnKey() + ", mise à jour... ");
+                     tabReplicat[i][0] = this.successor.returnKey();
+                     //System.out.println("Mise à jour OK, nouvelle key : " + tabReplicat[i][0]);   
+                     System.out.println("Mise à jour des réplicats faites...");
+                 }
+                 if(!tabReplicat[i][1].equals(this.successor.returnValue())){
+                      //System.out.println("Le sucesseur à change sa valeur" + this.returnValue() + ", mise à jour... ");
+                      tabReplicat[i][1] =  this.successor.returnValue();
+                       //System.out.println("Mise à jour OK, nouvelle valeur : " + tabReplicat[i][1]);   
+                      System.out.println("Mise à jour des réplicats faites...");
+                 }
             }
-             
-        }
-       
+         }
 
     @Override
-    public String getReplicat(String restaurant) throws RemoteException {
-       return this.directoryReplicat.get(restaurant);
-    }
-
-    @Override
-    public String chercheValeurKeyReplicat(String recherche) throws RemoteException  {
+    public boolean chercheValeurKeyReplicat(String recherche) throws RemoteException  {
            for(int i = 0; i < tabReplicat.length; i++){
-                     System.out.println("Je cherche" + recherche + "dans" + tabReplicat[i][0]);
-                    if( tabReplicat[i][0] == recherche){
+                    if( tabReplicat[i][0].equals(recherche)){
                          System.out.println("Trouvé,  Value : " + tabReplicat[i][1]);
-                        return tabReplicat[i][1];
+                        return true;
                     }
             }
  
-            return null;
+            return false;
         
     }
 	
