@@ -31,7 +31,7 @@ public interface Tracker extends Remote {
     
     public boolean delPeer(Peer peer) throws RemoteException;
 
-    public void RestaureData(Map<String, String> directoryReplicat)  throws RemoteException;
+    public void restoreData(Map<String, String> directoryReplicat)  throws RemoteException;
 
 
 }

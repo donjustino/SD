@@ -19,24 +19,31 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class implements the {@link Tracker} interface. This implementation 
- * use a list of peers to keep track of the peers that belong to the network.
+ * This class implements the {@link Tracker} interface. This implementation use
+ * a list of peers to keep track of the peers that belong to the network.
  */
 public class TrackerImpl extends UnicastRemoteObject implements Tracker {
 
-	/** Default serialization ID */
+    /**
+     * Default serialization ID
+     */
     private static final long serialVersionUID = 1L;
 
-    /** List of peers that belong to the network */
+    /**
+     * List of peers that belong to the network
+     */
     private final List<Peer> peers;
 
-    /** Used for random picking in the peer list*/
+    /**
+     * Used for random picking in the peer list
+     */
     private final Random randomGenerator;
 
     private List successeurMort = new LinkedList();
+
     public TrackerImpl(int port) throws RemoteException, MalformedURLException,
             AlreadyBoundException {
-       
+
         this.peers = new ArrayList<Peer>();
         this.randomGenerator = new Random();
         // The tracker is a remotely accessible object: bind it to an RMI 
@@ -66,34 +73,31 @@ public class TrackerImpl extends UnicastRemoteObject implements Tracker {
         if (this.peers.isEmpty()) {
             return null;
         }
-        
+
         return this.peers.get(this.randomGenerator.nextInt(this.peers.size()));
     }
+
     @Override
     public synchronized boolean delPeer(Peer peer) throws RemoteException {
-		return this.peers.remove(peer);
-		
+        return this.peers.remove(peer);
+
     }
-    public void RestaureData(Map<String, String> directoryReplicat)  throws RemoteException{
-              boolean verif = false; 
-              Peer landmarkPeer = this.getRandomPeer();
-              Peer nextPeer = landmarkPeer;
 
-		do {
-                     nextPeer = nextPeer.getSuccessor();
-                     if(nextPeer.getDirectory().isEmpty()){
-                         System.out.println("Valeur du peer : " + nextPeer.describe());
-                         nextPeer.setDirectory(directoryReplicat);
-                         System.out.println("Affectation du replicat à un anneau avec un directory vide : " + nextPeer.describe());
-                         verif = true;
-                     }
-                     
-                        
+    public void restoreData(Map<String, String> directoryReplicat) throws RemoteException {
+        boolean verif = false;
+        Peer landmarkPeer = this.getRandomPeer();
+        Peer nextPeer = landmarkPeer;
 
-		
-		} while ((!nextPeer.equals(landmarkPeer) || verif == false));
-            
-            
+        do {
+            nextPeer = nextPeer.getSuccessor();
+            if (nextPeer.getDirectory().isEmpty()) {
+                nextPeer.setDirectory(directoryReplicat);
+                System.out.println("Affectation du replicat à un anneau avec un directory vide : " + nextPeer.describe());
+                verif = true;
+            }
+
+        } while ((!nextPeer.equals(landmarkPeer) || verif != true));
+
     }
 
 }
