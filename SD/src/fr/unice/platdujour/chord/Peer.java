@@ -144,4 +144,6 @@ public interface Peer extends Remote {
     public void printReplicat() throws RemoteException;
     
     public void update() throws RemoteException;
+
+    public String chercheValeurKeyReplicat(String recherche) throws RemoteException;;
 }

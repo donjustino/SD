@@ -58,9 +58,9 @@ Peer {
         
         Peer replicatsuccessor;
         
-        static int nbReplicat = 2;
+        public static int nbReplicat = 2;
         
-        String[][] tabReplicat = new String[nbReplicat][2]; 
+        public static String[][] tabReplicat = new String[nbReplicat][2]; 
 	public PeerImpl(Identifier id) throws RemoteException {
 		this.id = id;
 		this.predecessor = this;
@@ -410,7 +410,7 @@ Peer {
         
         
         public void saveReplicat() throws RemoteException{
-          Peer temp = this.successor;
+                Peer temp = this.successor;
 		
 		for(int i = 0 ; i < nbReplicat ; i++){
                         tabReplicat[i][0] =  temp.returnKey();
@@ -419,14 +419,13 @@ Peer {
 		}
 	
              for(int i = 0; i < tabReplicat.length; i++){
-                    System.out.println("Key : " + tabReplicat[i] + " Value : " + tabReplicat[1]);
-            }
+                    System.out.println("Key : " + tabReplicat[i][0] + " Value : " + tabReplicat[i][1]);
+            } 
 
         }
        
         public void printReplicat() throws RemoteException{
-         
-            System.out.println("Je suis " + this.getId()  + " Mes sauvegardes de replicat Key: " + this.directoryReplicat );
+            //System.out.println("Key : " + tabReplicat[i][0] + " Value : " + tabReplicat[i][1]);
         }
 
     @Override
@@ -443,6 +442,20 @@ Peer {
     @Override
     public String getReplicat(String restaurant) throws RemoteException {
        return this.directoryReplicat.get(restaurant);
+    }
+
+    @Override
+    public String chercheValeurKeyReplicat(String recherche) throws RemoteException  {
+           for(int i = 0; i < tabReplicat.length; i++){
+                     System.out.println("Je cherche" + recherche + "dans" + tabReplicat[i][0]);
+                    if( tabReplicat[i][0] == recherche){
+                         System.out.println("Trouvé,  Value : " + tabReplicat[i][1]);
+                        return tabReplicat[i][1];
+                    }
+            }
+ 
+            return null;
+        
     }
 	
 }
