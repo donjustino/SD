@@ -95,8 +95,8 @@ public class Main {
                 System.out.println("Vérification des réplicats...OK");
                 update(tracker.getRandomPeer());
                 cherche(tracker.getRandomPeer());
-                //mort(tracker.getRandomPeer());
-                test.TestCoherance.test(tracker.getRandomPeer());
+                 mort(tracker.getRandomPeer());
+                //test.TestCoherance.test(tracker.getRandomPeer());
         }
 
         /**

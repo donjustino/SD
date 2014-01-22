@@ -75,21 +75,23 @@ public class TrackerImpl extends UnicastRemoteObject implements Tracker {
 		
     }
     public void RestaureData(Map<String, String> directoryReplicat)  throws RemoteException{
-           
+              boolean verif = false; 
               Peer landmarkPeer = this.getRandomPeer();
               Peer nextPeer = landmarkPeer;
 
 		do {
-                     System.out.println(directoryReplicat.toString());
-                     if(nextPeer.getDirectory().equals("{}")){
+                     nextPeer = nextPeer.getSuccessor();
+                     if(nextPeer.getDirectory().isEmpty()){
+                         System.out.println("Valeur du peer : " + nextPeer.describe());
                          nextPeer.setDirectory(directoryReplicat);
-                         System.out.println(nextPeer.getDirectory());
+                         System.out.println("Affectation du replicat à un anneau avec un directory vide : " + nextPeer.describe());
+                         verif = true;
                      }
                      
                         
 
-		nextPeer = nextPeer.getSuccessor();
-		} while (!nextPeer.equals(landmarkPeer));
+		
+		} while ((!nextPeer.equals(landmarkPeer) || verif == false));
             
             
     }
